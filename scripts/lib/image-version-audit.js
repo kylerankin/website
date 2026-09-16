@@ -79,6 +79,9 @@ export async function verifyRegistry(records, dependencies) {
       image: record.image,
       required: record.required,
       fields,
+      // A record awaiting SBOM publication or a reviewed mapping. Its absence
+      // is expected, so the issue plan must not alert on it until it publishes.
+      pending: record.pendingSbom === true || fields.length === 0,
     }
 
     let collected

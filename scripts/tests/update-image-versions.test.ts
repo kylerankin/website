@@ -219,6 +219,7 @@ describe('verifyRegistry — failure policy', () => {
       'ambiguousRequired',
       'ambiguousOptional',
       'rejected',
+      'pending',
     ])
     for (const key of Object.keys(image)) {
       expect(allowedKeys).toContain(key)
