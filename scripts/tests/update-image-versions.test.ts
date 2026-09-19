@@ -188,6 +188,24 @@ describe('verifyRegistry — failure policy', () => {
     expect(result.images[0].errorCode).toBe('missing-sbom')
   })
 
+  it('does not build an issue for a pending record that never publishes its SBOM', async () => {
+    // End-to-end: the registry marks the record pending, and buildSbomIssuePlan
+    // must suppress the resulting missing-sbom. This joins the two halves the
+    // per-fixture tests exercise in isolation -- a `pending: false` change in
+    // the audit would keep this suite green while the issue keeps firing.
+    const pending = Object.freeze({ ...REQUIRED_RECORD, pendingSbom: true, packages: {} })
+    const err = new EvidenceError('missing-sbom', pending.image, 'no sbom')
+    const collect = vi.fn().mockRejectedValue(err)
+
+    const audit = await verifyRegistry([pending], { collectVerifiedImageSbom: collect })
+
+    expect(audit.images[0].pending).toBe(true)
+    const plan = buildSbomIssuePlan(audit, [])
+    expect(plan.create).toHaveLength(0)
+    expect(plan.update).toHaveLength(0)
+    expect(plan.close).toHaveLength(0)
+  })
+
   it('includes checkedAt from the injected now() function', async () => {
     const collect = makeCollector(SBOM_WITH_ALL)
     const now = () => '2026-08-26T00:00:00.000Z'

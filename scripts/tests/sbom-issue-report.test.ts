@@ -341,6 +341,17 @@ describe('buildSbomIssuePlan — exact error codes, degraded entries, and eviden
     expect(plan.create).toHaveLength(1)
     expect(plan.create[0].title).toBe('[SBOM verification] dakota: missing-sbom')
   })
+
+  it('reports the pending-mapping digest so the artifact can be inspected', () => {
+    // Restored: a pending-mapping image still produces an issue whose body
+    // carries its digest. This is the boundary the new missing-sbom filter must
+    // not cross -- it keys on errorCode === 'missing-sbom', so a pending-mapping
+    // record must keep alerting. Without this, an over-broad widening of the
+    // filter would go unnoticed.
+    const plan = buildSbomIssuePlan(makeAudit([PENDING_IMAGE]), [])
+    expect(plan.create).toHaveLength(1)
+    expect(plan.create[0].body).toContain(PENDING_IMAGE.imageDigest)
+  })
 })
 
 // Helper to compute the expected title for an image (mirrors internal logic)
