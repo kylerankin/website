@@ -57,6 +57,10 @@ describe('useLocale', () => {
     expect(resolveLocale('uk-UA')).toBe('uk')
     expect(resolveLocale('en-GB')).toBe('en-US')
     expect(resolveLocale('de-de')).toBe('de-DE')
+    // The base-language step is case-insensitive too: an uppercase base tag
+    // (uk-ua) must match the lowercase bundle base (uk), not fall through.
+    expect(resolveLocale('uk-ua')).toBe('uk')
+    expect(resolveLocale('De-AT')).toBe('de-DE')
   })
 
   it('keeps the default for an ambiguous base language', () => {

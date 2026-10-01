@@ -164,12 +164,14 @@ stale, including for a locale file that no longer exists. Check
 `ls src/locales/` before trusting it: an absent file makes the task a
 new-locale addition, so the `SUPPORTED_LOCALES` edit above is required.
 
-The filename tag is matched exactly. `App.vue`, `DakotaApp.vue`, and
-`ServerApp.vue` select a locale only when `?lang=` or `navigator.language`
-equals an available tag, with no language-subtag fallback: a bare-language
-file (`cs`) is not picked for a `cs-CZ` browser, and a region file (`sk-SK`)
-is not picked for a bare `sk` browser. Keep the tag the issue names; changing
-the matching is a runtime change, not locale content.
+Matching is case-insensitive with a base-language fallback, both in
+`src/composables/useLocale.ts` (`resolveLocale`), not by the filename tag:
+a bare-language file (`cs`) is picked for a `cs-CZ` browser, and a region
+file (`sk-SK`) is picked for a bare `sk` browser, when exactly one bundle
+shares the base language. An ambiguous base (`zh`, shared by zh-HK/
+zh-Hans/zh-TW) resolves to nothing, leaving the default locale. Keep the
+tag the issue names; changing the matching is a runtime change, not locale
+content.
 
 ## Locale completeness
 

@@ -35,7 +35,7 @@ export function resolveLocale(
     return exact
   }
 
-  const base = requested?.split('-')[0]
+  const base = requested?.split('-')[0].toLowerCase()
   if (!base) {
     return undefined
   }
