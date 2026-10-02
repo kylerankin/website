@@ -242,7 +242,6 @@ single-base-language fallback, then default):
 rg -n "resolveLocale|navigator.language" \
   src/App.vue src/DakotaApp.vue src/ServerApp.vue src/composables/useLocale.ts
 ```
-```
 
 ## Locale parity for a new or completed translation
 

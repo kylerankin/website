@@ -14,10 +14,13 @@ export function setLocale(locale: string): void {
  *
  * Browsers rarely report a bare bundle tag: a Ukrainian browser reports
  * `uk-UA`, a German one `de-DE`. The exact tag is only present when the
- * caller already passed a full bundle. Two steps cover both:
+ * caller already passed a full bundle. Three steps cover both:
  *
  * 1. Case-insensitive exact match, so `UK` still resolves to `uk`.
- * 2. Base-language fallback, so `uk-UA` -> `uk` and `en-GB` -> `en-US`.
+ * 2. Longest-prefix match on whole subtags, so a script-qualified
+ *    `zh-Hans-CN` resolves to the bundled `zh-Hans` instead of falling
+ *    through to the ambiguous `zh` base.
+ * 3. Base-language fallback, so `uk-UA` -> `uk` and `en-GB` -> `en-US`.
  *    This only fires when exactly one bundled locale shares the base
  *    language; `zh` / `zh-CN` stays ambiguous (zh-HK, zh-Hans, zh-TW) and
  *    resolves to nothing, leaving the default locale in place.
@@ -38,6 +41,15 @@ export function resolveLocale(
   const base = requested?.split('-')[0].toLowerCase()
   if (!base) {
     return undefined
+  }
+
+  const subtags = requested!.split('-')
+  for (let length = subtags.length - 1; length > 1; length--) {
+    const prefix = subtags.slice(0, length).join('-').toLowerCase()
+    const prefixMatch = available.find(loc => loc.toLowerCase() === prefix)
+    if (prefixMatch) {
+      return prefixMatch
+    }
   }
 
   const matches = available.filter(loc => loc.split('-')[0].toLowerCase() === base)

@@ -63,6 +63,12 @@ describe('useLocale', () => {
     expect(resolveLocale('De-AT')).toBe('de-DE')
   })
 
+  it('resolves a script-qualified tag to its prefix bundle', () => {
+    // zh-Hans-CN reduces to the bundled zh-Hans rather than the ambiguous zh.
+    expect(resolveLocale('zh-Hans-CN')).toBe('zh-Hans')
+    expect(resolveLocale('zh-hans-cn')).toBe('zh-Hans')
+  })
+
   it('keeps the default for an ambiguous base language', () => {
     // zh maps to three bundles, so no single pick — leave the default on.
     expect(resolveLocale('zh')).toBeUndefined()
