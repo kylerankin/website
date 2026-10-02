@@ -40,7 +40,7 @@ export function resolveLocale(
     return undefined
   }
 
-  const matches = available.filter(loc => loc.split('-')[0] === base)
+  const matches = available.filter(loc => loc.split('-')[0].toLowerCase() === base)
   if (matches.length === 1) {
     return matches[0]
   }

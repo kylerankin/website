@@ -235,11 +235,13 @@ npx vitest run src/tests/locale-completeness.test.ts
 - [ ] Unlisted status is unchanged.
 - [ ] Relevant checks pass.
 
-Re-derive the exact-match locale selection (no language-subtag fallback):
+Re-derive the locale selection logic (case-insensitive exact match, then
+single-base-language fallback, then default):
 
 ```bash
-rg -n "navigator.language|availableLocales.includes" \
-  src/App.vue src/DakotaApp.vue src/ServerApp.vue
+rg -n "resolveLocale|navigator.language" \
+  src/App.vue src/DakotaApp.vue src/ServerApp.vue src/composables/useLocale.ts
+```
 ```
 
 ## Locale parity for a new or completed translation
