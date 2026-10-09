@@ -114,6 +114,22 @@ import from it pass locally but fail in a clean worktree. Always commit the
 implementation in the same commit as the tests that import it, or in a prior
 commit. Never commit a test file before the module it imports.
 
+### Element pins follow the published SBOM, not the last known name
+
+BuildStream element locators are upstream-controlled and get renamed without
+warning. When a `missing-required` alert appears for a field that is known to
+ship, the pin's `element` locator is the first thing to check — it has drifted
+from the artifact that is actually published.
+
+Concrete case: `dakota` `mesa` was pinned to
+`freedesktop-sdk.bst:extensions/mesa/mesa.bst`. freedesktop-sdk renamed that
+build element to `extensions/mesa/mesa-extra.bst`; the published SBOM carries
+`mesa` only under the new name, so the old pin read `mesa` as missing-required.
+The fix was to move the pin to the new element (resolved to `26.2.2`), not to
+weaken `required` or fall back to a name-only lookup. Always confirm the new
+locator against the current published SPDX before trusting it, then update the
+pin, the fixture, and the test that asserts the pin together.
+
 ### Bluefin projection-layer normalisation
 
 User-facing RPM versions in `stream-versions.yml` are normalised by
