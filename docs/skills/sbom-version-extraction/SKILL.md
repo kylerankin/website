@@ -116,18 +116,22 @@ commit. Never commit a test file before the module it imports.
 
 ### Element pins follow the published SBOM, not the last known name
 
-BuildStream element locators are upstream-controlled and get renamed without
-warning. When a `missing-required` alert appears for a field that is known to
-ship, the pin's `element` locator is the first thing to check — it has drifted
-from the artifact that is actually published.
+BuildStream element locators change when dakota (or an upstream junction)
+switches which element provides a component. When a `missing-required` alert
+appears for a field that is known to ship, the pin's `element` locator is the
+first thing to check — it has drifted from the artifact that is actually
+published.
 
 Concrete case: `dakota` `mesa` was pinned to
-`freedesktop-sdk.bst:extensions/mesa/mesa.bst`. freedesktop-sdk renamed that
-build element to `extensions/mesa/mesa-extra.bst`; the published SBOM carries
-`mesa` only under the new name, so the old pin read `mesa` as missing-required.
-The fix was to move the pin to the new element (resolved to `26.2.2`), not to
-weaken `required` or fall back to a name-only lookup. Always confirm the new
-locator against the current published SPDX before trusting it, then update the
+`freedesktop-sdk.bst:extensions/mesa/mesa.bst`. freedesktop-sdk still ships
+both `extensions/mesa/mesa.bst` (`video_codecs: all_free`) and
+`extensions/mesa/mesa-extra.bst` (`video_codecs: all`); nothing was renamed
+upstream. projectbluefin/dakota#1687 (2d69f9ec) pointed dakota's
+`elements/core/mesa-default.bst` at `mesa-extra.bst`, so the published SBOM
+carries `mesa` only under that element and the old pin read `mesa` as
+missing-required. The fix was to move the pin to `mesa-extra.bst` (resolved to
+`26.2.2`), not to weaken `required` or fall back to a name-only lookup.
+Always confirm the new locator against the current published SPDX before trusting it, then update the
 pin, the fixture, and the test that asserts the pin together.
 
 ### Bluefin projection-layer normalisation
